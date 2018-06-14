@@ -13,3 +13,8 @@ def LocalSolve(img_lr, feat_lr, dictionary):
     dim_feat = patch_size_feat ** 2 * lr_feat_nchannel
 
     img_out = resize(img_lr, [nrow_hr, ncol_hr])
+    aggr_times = np.zeros((nrow_hr, ncol_hr))
+
+    return img_out, aggr_times
+
+for 
