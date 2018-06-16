@@ -1,6 +1,5 @@
 import numpy as np
 from SetParams import params
-from PreProcess import img_data
 from Train import Train
 from LocalSolve import LocalSolve
 from GlobalSolve import GlobalSolve
@@ -14,6 +13,7 @@ nrow = np.shape(img)[0]
 ncol = np.shape(img)[1]
 nchl = np.shape(img)[2]
 # img_data = PreProcess(img, params)
+from PreProcess import img_data
 img_us = resize(img_data.img_ds, params.sr_scale)
 
 
