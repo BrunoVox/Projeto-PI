@@ -1,8 +1,22 @@
-import SetParams
+from SetParams import params
 from scipy import signal
 from skimage.transform import resize
 from skimage.color import rgb2ycbcr
 import numpy as np
+import types
+
+
+# class img_data:
+#     def __init__(self, **kwargs):
+#         self.__dict__.update(kwargs)
+
+#     def __repr__(self):
+#         keys = sorted(self.__dict__)
+#         items = ('{}={!r}'.format(k, self.__dict__[k]) for k in keys)
+#         return '{}({})'.format(type(self).__name__, ', '.join(items))
+
+#     def __eq__(self, other):
+#         return self.__dict__ == other.__dict__
 
 def ImgDownSample(img, blur_kernel, scale):
     if type(img) == int:
@@ -10,32 +24,44 @@ def ImgDownSample(img, blur_kernel, scale):
     if img.shape[2] == 1:
         img_blur = signal.convolve2d(img, blur_kernel, mode="same")
     else:
-        img_blur = np.zeros(np.shape(img))
-        for i in range(0, img.shape[2]):
-            img_blur[:, :, i] = signal.convolve2d(img[:, :, i], blur_kernel, mode="same")
-    img_ds = resize(img, (img.shape[0] / scale, img.shape[1] / scale))
+        img_blur = np.zeros((np.shape(img)))
+        for i in range(img.shape[2]):
+            img_blur[:,:,i] = signal.convolve2d(img[:,:,i], blur_kernel, mode="same")
+    img_ds = resize(img, (img.shape[0]/scale, img.shape[1]/scale))
     img_ds = int(img_ds)
     return img_ds
 
-
-def PreProcess(img):
-    img_ds = ImgDownSample(img, blur_kernel, sr_scale)
-    [number_rows, number_cols, number_channels] = np.shape(img_ds)[0], np.shape(img_ds)[1], np.shape(img_ds)[2]
-    if number_channels == 3:
+def PreProcess(img, params):
+    img_ds = ImgDownSample(img, params.blur_kernel, params.sr_scale)
+    # nrow = np.shape(img_ds)[0]
+    # ncol = np.shape(img_ds)[1]
+    nchl = np.shape(img_ds)[2]
+    if nchl == 3:
         img_hr = rgb2ycbcr(img)
         img_lr = rgb2ycbcr(img_ds)
-        img_hr = float(img_hr[:, :, 0])
-        img_lr = float(img_lr[:, :, 0])
+        img_hr = float(img_hr[:,:,0])
+        img_lr = float(img_lr[:,:,0])
     else:
         img_hr = float(img)
         img_lr = float(img)
 
-    nchannels_feat = len(lr_filters)
-    img_rs = resize(img_lr, lr_feat_scale)
-    [nr, nc] = np.shape(img_rs)[0], np.shape(img_rs)[1]
-    feat_lr = np.zeros(nr, nc, nchannels_feat)
+    nchannels_feat = len(params.lr_filters)
+    img_rs = resize(img_lr, params.lr_feat_scale)
+    nr = np.shape(img_rs)[0]
+    nc = np.shape(img_rs)[1]
+    feat_lr = np.zeros((nr, nc, nchannels_feat))
 
-    for i in range(0, len(nchannels_feat)):
-        feat_lr[:, :, i] = signal.convolve2d(img_rs, lr_filters[i], "same")
+    for i in range(len(nchannels_feat)):
+        feat_lr[:,:,i] = signal.convolve2d(img_rs, params.lr_filters[i], "same")
 
-    img_data = {"img_ori": img, "img_ds": img_ds, "img_hr": img_hr, "img_lr": img_lr, "feat_lr": feat_lr}
+    return img, img_ds, img_hr, img_lr, feat_lr
+
+img_data = types.SimpleNamespace()
+from SR import img
+# img_ds = ImgDownSample(img, blur_kernel, scale)
+temp = PreProcess(img, params)
+img_data.img_ori = temp[0]
+img_data.img_ds = temp[1]
+img_data.img_hr = temp[2]
+img_data.img_lr = temp[3]
+img_data.feat_lr = temp[4]

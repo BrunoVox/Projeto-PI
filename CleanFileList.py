@@ -16,7 +16,8 @@ def CleanFileList(file_list, ext_set):
     for i in range(1, num_file):
         if (IsReserve(file_list[i].name, ext_set)):
             valid_flag[i] = 1
-    return valid_flag
+    return file_list[valid_flag == 1], np.sum(valid_flag)
 
-file_list_new = file_list[valid_flag==1]
-num_file = sum(valid_flag)
+temp = CleanFileList(file_list, ext_set)
+file_list_new = temp [0]
+num_file = temp[1]
