@@ -53,7 +53,7 @@ class params:
     patch_num = 12000
     dict_file = "dict_SR"
     lr_filters = [[1,0,-1], [[1],[0],[-1]], [1,0,-2,0,1], [[1],[0],[-2],[0],[1]]] # ERA TUPLE
-    lr_feat_nchannel = len(lr_filters)
+    lr_feat_nchl = len(lr_filters)
     lr_feat_scale = 2
 
     class train_param:
